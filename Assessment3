@@ -320,22 +320,22 @@ class StatisticsMenu(Menu):
         self.allowed_input = ['1', '2', '3','4','5','6']
         
         
-        def _print_dine_in_orders(self,order_list):
+    def print_dine_in_orders(self,order_list):
             self.order_list = orders
-            dine_in_orders = [order for order in self.order_list if order['ordering_mode'] == 'DINE_IN']
+            dine_in_orders = [order for order in self.order_list if order.ordering_mode == 'DINE_IN']
             print(dine_in_orders["id"], dine_in_orders["date"], dine_in_orders["ordering_mode"])  
             
-        def _print_pick_up_orders(self,order_list):
+    def print_pick_up_orders(self,order_list):
             self.order_list = orders
-            pick_up_orders = [order for order in self.order_list if order['ordering_mode'] == 'SELF_PICKUP']
+            pick_up_orders = [order for order in self.order_list if order.ordering_mode == 'SELF_PICKUP']
             print(pick_up_orders["id"], pick_up_orders["date"], pick_up_orders["ordering_mode"])  
        
-        def _print_deliveries(self,order_list):
+    def print_deliveries(self,order_list):
             self.order_list = orders
-            deliveries = [order for order in self.order_list if order['ordering_mode'] == 'HOME_DELIVERY']
+            deliveries = [order for order in self.order_list if order.ordering_mode == 'HOME_DELIVERY']
             print(deliveries["id"], deliveries["date"], deliveries["ordering_mode"]) 
             
-        def _print_all_orders(self,order_list):
+    def print_all_orders(self,order_list):
             self.order_list = orders
             print(self.order_list["id"], self.order_list["date"], self.order_list["ordering_mode"])     
             
@@ -343,35 +343,16 @@ class StatisticsMenu(Menu):
         #def _print_totalAmount_allOrders(self):
             
         
-        def _user_choice_processing(self, user_choice):
-         if user_choice == self.allowed_input[0]:    # 1 All Dine in Orders
+    def _user_choice_processing(self, user_choice):
+        if user_choice == self.allowed_input[0]:    # 1 All Dine in Orders
             self.print_dine_in_orders()
-         elif user_choice == self.allowed_input[1]:  # 2 All Picp up Orders
-             self.print_pick_up_orders()
-         elif user_choice == self.allowed_input[2]:  # 3 All Deliveries
-             self.print_deliveries()
-         elif user_choice == self.allowed_input[3]:  # 4 All Orders (Ascending Order
-             self.print_all_orders()
-         '''elif user_choice == self.allowed_input[4]:  # 5 Total Amount Spent on All Orders
-             self.print_totalAmount_allOrders()
-         elif user_choice == self.allowed_input[5]:  # 6 To go to Previous Menu
-         '''
-
-    def print_list(self):
-        for order in orders:
-            print(  order.id,
-                    order.date,
-                    order.time,
-                    order.number_of_persons,
-                    order.name_of_person_picking_up,
-                    order.distance,
-                    order.ordering_mode,
-                    order.items )
-    '''def _print_pick_up_orders(self):
-     def _print_deliveries(self):
-     def _print_all_orders(self):
-     def _print_totalAmount_allOrders(self): '''
-
+        elif user_choice == self.allowed_input[1]:  # 2 All Picp up Orders
+            self.print_pick_up_orders()
+        elif user_choice == self.allowed_input[2]:  # 3 All Deliveries
+            self.print_deliveries()
+        elif user_choice == self.allowed_input[3]:  # 4 All Orders (Ascending Order
+            self.print_all_orders()
+         
 
 class OrderingMenu(Menu):
     def __init__(self):
