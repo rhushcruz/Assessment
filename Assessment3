@@ -347,8 +347,7 @@ class StatisticsMenu(Menu):
         
     def print_all_orders(self):
         print(f'Order Id\t\t Date\t\t\tTotal Amount Paid\t\tType of Order')
-        account.get_signed_in_user().orders.reverse()
-        for order in account.get_signed_in_user().orders:
+        for order in reversed(account.get_signed_in_user().orders):  
             print(f'{order.id}\t\t\t{order.date}\t\t\t{order.get_total_price_with_charges()}\t\t\t\t\t\t{order.ordering_mode}')  
         StatisticsMenu().execute()
         
