@@ -108,7 +108,7 @@ class Account:
             print('You have not Signed up with this contact number, please Sign up first.')
         else:
             if current_user.password == password:
-                self.signed_in_user = current_user   # Set info that current user Signed in
+                self.signed_in_user = current_user  # Set info that current user Signed in
                 print('\nYou have successfully Signed in')
                 print(f'Welcome {current_user.name}!')
                 return True
@@ -256,12 +256,12 @@ class StartMenu(Menu):
 
     def _user_choice_processing(self, user_choice):
         current_order.reset()
-        if user_choice == self.allowed_input[0]:     # 1 Sign Up
+        if user_choice == self.allowed_input[0]:  # 1 Sign Up
             account.sign_up()
-        elif user_choice == self.allowed_input[1]:   # 2 Sign In
+        elif user_choice == self.allowed_input[1]:  # 2 Sign In
             if account.sign_in():
                 SignInMenu().execute()
-        elif user_choice == self.allowed_input[2]:   # 3 Quit
+        elif user_choice == self.allowed_input[2]:  # 3 Quit
             print('\nThank you for using the Application!')
             account.set_action('QUIT')
 
@@ -279,12 +279,12 @@ class SignInMenu(Menu):
         self._show_menu()
         user_choice = self._get_user_choice()
         self._user_choice_processing(user_choice)
-        if account.get_action() == 'CANCEL_ORDER':
+        if account.get_action() == 'CANCEL_ORDER' or account.get_action() == 'PREV_MENU':
             account.reset_action()
             self.execute()
 
     def _user_choice_processing(self, user_choice):
-        if user_choice == self.allowed_input[0]:    # 2.1 Start Ordering
+        if user_choice == self.allowed_input[0]:  # 2.1 Start Ordering
             self._start_ordering()
         elif user_choice == self.allowed_input[1]:  # 2.2 Print Statistics
             self._print_statistics()
@@ -292,7 +292,6 @@ class SignInMenu(Menu):
             account.log_out()
             current_order.reset()
             print('You have successfully Logged out!')
-
 
     def _start_ordering(self):
         ordering_menu = OrderingMenu()
@@ -315,44 +314,65 @@ class StatisticsMenu(Menu):
                          '3 - All Deliveries.\n\t\t' \
                          '4 - All Orders (Ascending Order).\n\t\t' \
                          '5 - Total Amount Spent on All Orders.\n\t\t' \
-                         '6 - To go to Previous Menu.\n\t\t' \
-                                 
-        self.allowed_input = ['1', '2', '3','4','5','6']
+                         '6 - To go to Previous Menu.\n\t\t'
+        self.allowed_input = ['1', '2', '3', '4', '5', '6']
+
+    def print_dine_in_orders(self):
+        print(f'Order Id\t\t Date\t\t\tTotal Amount Paid\t\tType of Order')
+        for order in account.get_signed_in_user().orders:
+            if order.ordering_mode == 'DINE_IN':
+                print(f'{order.id}\t\t\t{order.date}\t\t\t{order.get_total_price_with_charges()}\t\t\t\t\t\t{order.ordering_mode}')  
+        StatisticsMenu().execute()
+    
+    def print_pick_up_orders(self):
+        print(f'Order Id\t\t Date\t\t\tTotal Amount Paid\t\tType of Order')
+        for order in account.get_signed_in_user().orders:
+            if order.ordering_mode == 'SELF_PICKUP':
+                print(f'{order.id}\t\t\t{order.date}\t\t\t{order.get_total_price_with_charges()}\t\t\t\t\t\t{order.ordering_mode}')  
+        StatisticsMenu().execute()
+
+    def print_deliveries(self):
+        print(f'Order Id\t\t Date\t\t\tTotal Amount Paid\t\tType of Order')
+        for order in account.get_signed_in_user().orders:
+            if order.ordering_mode == 'HOME_DELIVERY':
+                print(f'{order.id}\t\t\t{order.date}\t\t\t{order.get_total_price_with_charges()}\t\t\t\t\t\t{order.ordering_mode}')  
+        StatisticsMenu().execute()
+
+    '''def print_all_orders(self):
+        print(f'Order Id\t\t Date\t\t\tTotal Amount Paid\t\tType of Order')
+        for order in account.get_signed_in_user().orders:
+            order.sort(key=order.id, reverse=True)
+            print(f'{order.id}\t\t\t{order.date}\t\t\t{order.get_total_price_with_charges()}\t\t\t\t\t\t{order.ordering_mode}')  
+        StatisticsMenu().execute()'''
         
+    def print_all_orders(self):
+        print(f'Order Id\t\t Date\t\t\tTotal Amount Paid\t\tType of Order')
+        account.get_signed_in_user().orders.reverse()
+        for order in account.get_signed_in_user().orders:
+            print(f'{order.id}\t\t\t{order.date}\t\t\t{order.get_total_price_with_charges()}\t\t\t\t\t\t{order.ordering_mode}')  
+        StatisticsMenu().execute()
         
-    def print_dine_in_orders(self,order_list):
-            self.order_list = orders
-            dine_in_orders = [order for order in self.order_list if order.ordering_mode == 'DINE_IN']
-            print(dine_in_orders["id"], dine_in_orders["date"], dine_in_orders["ordering_mode"])  
-            
-    def print_pick_up_orders(self,order_list):
-            self.order_list = orders
-            pick_up_orders = [order for order in self.order_list if order.ordering_mode == 'SELF_PICKUP']
-            print(pick_up_orders["id"], pick_up_orders["date"], pick_up_orders["ordering_mode"])  
-       
-    def print_deliveries(self,order_list):
-            self.order_list = orders
-            deliveries = [order for order in self.order_list if order.ordering_mode == 'HOME_DELIVERY']
-            print(deliveries["id"], deliveries["date"], deliveries["ordering_mode"]) 
-            
-    def print_all_orders(self,order_list):
-            self.order_list = orders
-            print(self.order_list["id"], self.order_list["date"], self.order_list["ordering_mode"])     
-            
-            
-        #def _print_totalAmount_allOrders(self):
-            
+    def print_totalAmount_allOrders(self):
+        totalorder=0
+        for order in account.get_signed_in_user().orders:
+            totalorder += order.get_total_price_with_charges()
+        print('Total amount spent on all orders AUD: ',totalorder)
+        StatisticsMenu().execute()
         
     def _user_choice_processing(self, user_choice):
-        if user_choice == self.allowed_input[0]:    # 1 All Dine in Orders
+        if user_choice == self.allowed_input[0]:  # 1 All Dine in Orders
             self.print_dine_in_orders()
-        elif user_choice == self.allowed_input[1]:  # 2 All Picp up Orders
+        elif user_choice == self.allowed_input[1]:  # 2 All Pick up Orders
             self.print_pick_up_orders()
         elif user_choice == self.allowed_input[2]:  # 3 All Deliveries
             self.print_deliveries()
-        elif user_choice == self.allowed_input[3]:  # 4 All Orders (Ascending Order
+        elif user_choice == self.allowed_input[3]:  # 4 All Orders (Ascending Order)
             self.print_all_orders()
-         
+        elif user_choice == self.allowed_input[4]:  # 5 Total amount
+            self.print_totalAmount_allOrders()
+        elif user_choice == self.allowed_input[5]:  # 6 Go to the Previous Menu
+            account.set_action('PREV_MENU')
+
 
 class OrderingMenu(Menu):
     def __init__(self):
@@ -364,7 +384,7 @@ class OrderingMenu(Menu):
         self.allowed_input = ['1', '2', '3']
 
     def _user_choice_processing(self, user_choice):
-        if user_choice == self.allowed_input[0]:    # 1 Dine In
+        if user_choice == self.allowed_input[0]:  # 1 Dine In
             current_order.set_ordering_mode('DINE_IN')
             FoodMenu(show_drinks=True).execute()
         elif user_choice == self.allowed_input[1]:  # 2 Order Online
@@ -447,7 +467,7 @@ class FoodMenu(Menu):
     def _checkout(self):
         print(f'The total amount to be paid: {current_order.get_total_price()} AUD')
         print('\nPlease Enter Y to proceed to Checkout or Enter N to cancel the order:')
-        user_choice = Utils().get_user_choice(['Y','N'])
+        user_choice = Utils().get_user_choice(['Y', 'N'])
         if user_choice == 'N':
             current_order.reset()
             account.set_action('CANCEL_ORDER')
@@ -466,13 +486,15 @@ class FoodMenu(Menu):
                 if current_order.ordering_mode == 'DINE_IN':
                     service_charges = current_order.get_service_charges()
                     total_amount = current_order.get_total_price_with_charges()
-                    print(f'\nYour total payable amount is: AUD {round(total_amount, 2)} including AUD {round(service_charges, 2)} for Service Charges')
+                    print(
+                        f'\nYour total payable amount is: AUD {round(total_amount, 2)} including AUD {round(service_charges, 2)} for Service Charges')
                 elif current_order.ordering_mode == 'SELF_PICKUP':
                     total_amount = current_order.get_total_price_with_charges()
                     print(f'\nYour total payable amount is: AUD {round(total_amount, 2)}')
                 elif current_order.ordering_mode == 'HOME_DELIVERY':
                     total_amount = current_order.get_total_price_with_charges()
-                    print(f'\nYour total payable amount is: AUD {round(total_amount, 2)} and there will be  an additional charges for Delivery')
+                    print(
+                        f'\nYour total payable amount is: AUD {round(total_amount, 2)} and there will be  an additional charges for Delivery')
                 print('\nDo you want to proceed? [Y, N]: ')
                 user_choice = Utils().get_user_choice(['Y', 'N'])
                 if user_choice == 'N':
@@ -515,6 +537,7 @@ class FoodMenu(Menu):
                             print('\nThank you for your Order, Your Order has been Confirmed.')
                     current_order.reset()
 
+
 class DrinksMenu(FoodMenu):
     def __init__(self):
         super().__init__(show_drinks=True)
@@ -540,20 +563,22 @@ class DrinksMenu(FoodMenu):
             for item in self.items:
                 if item.id == int(user_choice):
                     current_order.add_item(item)
-                    print(f'\n{item.name} added to your order. Total price = {round(current_order.get_total_price(), 2)} AUD\n')
+                    print(
+                        f'\n{item.name} added to your order. Total price = {round(current_order.get_total_price(), 2)} AUD\n')
                     break
             DrinksMenu().execute()
+
 
 # The main program begins
 users = []
 orders = []
 
-#TESTING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# TESTING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 user1 = User('Sergey1', 'Brisbane1', '0987654321', 'S@2', '01/11/1111')
 user2 = User('Sergey2', 'Brisbane2', '0987654322', 'S@2', '02/11/1111')
 users.append(user1)
 users.append(user2)
-    #TESTING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# TESTING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 account = Account()
 current_order = Order()
